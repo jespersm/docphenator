@@ -48,7 +48,7 @@ class XmlHyphenatorTest {
         var hyphenated = sink.toString(StandardCharsets.UTF_8);
 
         assertNotEquals(xmlDocument, hyphenated);
-        System.out.println(hyphenated);
+        // System.out.println(hyphenated);
         assertTrue(hyphenated.contains("com\u00ADpu\u00ADte\u00ADre"));
     }
 }
