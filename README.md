@@ -1,4 +1,3 @@
-```markdown
 # DocPhenator
 
 DocPhenator is a Java library designed to hyphenate text within XML documents. It leverages hyphenation patterns to insert soft hyphens into words, making text more readable when rendered in narrow columns.
@@ -75,5 +74,3 @@ This project is licensed under the LGPL License. See the `LICENSE` file for deta
 
 - Hyphenation patterns are sourced from [hyphenation.org](https://hyphenation.org).
 - The [Hypenator](https://github.com/Nianna/hyphenator) is used to hyphenate text.
-
-```
