@@ -34,7 +34,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 public class Example {
     public static void main(String[] args) throws Exception {
@@ -55,7 +54,7 @@ public class Example {
 
         Document doc = DocumentBuilderFactory.newDefaultNSInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xmlDocument.getBytes(StandardCharsets.UTF_8)), "UTF-8");
 
-        new XmlHyphenator().hyphenateDocument(doc, Optional.of("da"));
+        new XmlHyphenator().hyphenateDocument(doc, "da");
 
         var sink = new ByteArrayOutputStream();
         javax.xml.transform.TransformerFactory.newDefaultInstance().newTransformer().transform(new DOMSource(doc), new StreamResult(sink));
