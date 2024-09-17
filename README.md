@@ -16,7 +16,7 @@ To use DocPhenator in your project, add the following dependency to your `pom.xm
 <dependency>
     <groupId>io.github.jespersm</groupId>
     <artifactId>docphenator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
