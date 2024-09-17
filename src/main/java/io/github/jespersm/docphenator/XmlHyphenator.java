@@ -9,7 +9,6 @@ import org.w3c.dom.Text;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Hyphenates text in an XML document.
@@ -33,7 +32,7 @@ public class XmlHyphenator {
      * @param defaultLanguage default language to use if no language is specified throughout the document.
      * @throws LanguageNotSupportedException if the default language is not supported.
      */
-    public void hyphenateDocument(Document doc, Optional<String> defaultLanguage) throws LanguageNotSupportedException {
+    public void hyphenateDocument(Document doc, String defaultLanguage) throws LanguageNotSupportedException {
         hyphenateElement(doc.getDocumentElement(), defaultLanguage);
     }
 
@@ -43,19 +42,22 @@ public class XmlHyphenator {
      * @param defaultLanguage default language to use if no language is specified in the element and it's children.
      * @throws LanguageNotSupportedException if the default language is not supported.
      */
-    public void hyphenateElement(Element element, Optional<String> defaultLanguage) throws LanguageNotSupportedException {
+    public void hyphenateElement(Element element, String defaultLanguage) throws LanguageNotSupportedException {
         Deque<Hyphenator> hyphenators = new ArrayDeque<>();
-        if (defaultLanguage.isPresent()) {
-            hyphenators.push(manager.getHyphenator(defaultLanguage.get()));
+        if (defaultLanguage != null) {
+            hyphenators.push(manager.getHyphenator(defaultLanguage));
         } else {
             hyphenators.push(NULL_HYPHENATOR);
         }
-        if (element.getTagName().equals("style") |)
         hyphenateElement(element, hyphenators);
     }
 
-    private void hyphenateElement(Element documentElement, Deque<Hyphenator> hyphenators) {
-        var lang = documentElement.getAttribute("lang");
+    private void hyphenateElement(Element element, Deque<Hyphenator> hyphenators) {
+        String tagName = element.getTagName();
+        if (tagName.equals("style") || tagName.equals("script")) {
+            return;
+        }
+        var lang = element.getAttribute("lang");
         if (!lang.isEmpty()) {
             // Language is overridden from this element down
             try {
@@ -63,11 +65,11 @@ public class XmlHyphenator {
             } catch (LanguageNotSupportedException e) {
                 hyphenators.push(NULL_HYPHENATOR);
             }
-            processElementContents(documentElement, hyphenators);
+            processElementContents(element, hyphenators);
             hyphenators.pop();
         } else {
             // else use the current hyphenator
-            processElementContents(documentElement, hyphenators);
+            processElementContents(element, hyphenators);
         }
     }
 

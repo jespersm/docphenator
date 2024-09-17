@@ -13,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +24,7 @@ class XmlHyphenatorTest {
             String xmlDocument = """
                     <p lang='da'>Computer</p>
                     """;
-            var hyphenated = hyphenateXml(xmlDocument, Optional.empty());
+            var hyphenated = hyphenateXml(xmlDocument, null);
             assertEquals("""
                     <p lang="da">Com\u00ADpu\u00ADter</p>""", hyphenated);
         });
@@ -34,7 +33,7 @@ class XmlHyphenatorTest {
     @org.junit.jupiter.api.Test
     void test_hyphenateDocument_unsupported() {
         assertThrows(LanguageNotSupportedException.class,
-                () -> hyphenateXml("<a/>", Optional.of("li-LI"))); // Lilliputian
+                () -> hyphenateXml("<a/>", "li-LI")); // Lilliputian
     }
 
     @org.junit.jupiter.api.Test
@@ -43,7 +42,7 @@ class XmlHyphenatorTest {
             String xmlDocument = """
                     <p lang='da'>Det <b> nye </b> COMputer</p>
                     """;
-            var hyphenated = hyphenateXml(xmlDocument, Optional.empty());
+            var hyphenated = hyphenateXml(xmlDocument, null);
             assertEquals("""
                     <p lang="da">Det <b> nye </b> COM\u00ADpu\u00ADter</p>""", hyphenated);
         });
@@ -72,7 +71,7 @@ class XmlHyphenatorTest {
                   </p>
                 </document>
                 """;
-        var hyphenated = hyphenateXml(xmlDocument, Optional.of("en_US"));
+        var hyphenated = hyphenateXml(xmlDocument, "en_US");
         assertNotEquals(xmlDocument, hyphenated);
         assertTrue(hyphenated.contains("com\u00ADpu\u00ADte\u00ADre"));
     }
@@ -96,14 +95,14 @@ class XmlHyphenatorTest {
                   </body>
                 </html>
                 """;
-        var hyphenated = hyphenateXml(xmlDocument, Optional.of("en_US"));
-        //assertEquals(xmlDocument, hyphenated);
+        var hyphenated = hyphenateXml(xmlDocument, "en_US");
+
         assertFalse(hyphenated.contains("hy\u00ADphen"));
         assertFalse(hyphenated.contains("elon\u00ADgat\u00ADed"));
     }
 
 
-    private static String hyphenateXml(String xmlDocument, Optional<String> defaultLanguage) throws SAXException, IOException, ParserConfigurationException, LanguageNotSupportedException, TransformerException {
+    private static String hyphenateXml(String xmlDocument, String defaultLanguage) throws SAXException, IOException, ParserConfigurationException, LanguageNotSupportedException, TransformerException {
         Document doc = DocumentBuilderFactory.newDefaultNSInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xmlDocument.getBytes(StandardCharsets.UTF_8)), "UTF-8");
         new XmlHyphenator().hyphenateDocument(doc, defaultLanguage);
         var sink = new ByteArrayOutputStream();
