@@ -4,28 +4,40 @@ import io.github.nianna.api.Hyphenator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
+/**
+ * Manages the loading and caching of hyphenation patterns for different languages.
+ */
 public class HyphenationManager {
-    private Map<String, Optional<Hyphenator>> languageTagToHyphenator = new HashMap<>();
 
     /**
-     * Obtain a Hyphenator for a given language tag.
+     * Create a blank HyphenationManager.
+     */
+    public HyphenationManager() {
+    }
+
+    private final Map<String, Optional<Hyphenator>> languageTagToHyphenator = new HashMap<>();
+
+    /**
+     * Obtain a Hyphenator for a given language tag. If the Hyphenator for the given language tag has already been
+     * loaded, it will be returned from cache. Otherwise, the hyphenation patterns for the given language tag will be
+     * loaded and a new Hyphenator will be created in a thread safe manner.
+     *
      * @param tag BCP 47 language tag, like "da", or "en-UK".
      * @return A functioning Hyphenator for the given language tag.
      * @throws LanguageNotSupportedException If no hyphenation patterns are available for the given language tag.
      */
-    synchronized Hyphenator getHyphenator(String tag) throws LanguageNotSupportedException {
-        var maybeKnown = languageTagToHyphenator.get(tag);
+    public synchronized Hyphenator getHyphenator(String tag) throws LanguageNotSupportedException {
+        var normalizedTag = tag.toLowerCase(Locale.ENGLISH).replace("_", "-");
+
+        var maybeKnown = languageTagToHyphenator.get(normalizedTag);
         if (maybeKnown != null) {
             return maybeKnown.orElseThrow(() -> new LanguageNotSupportedException(tag));
         }
         // Try to load the hyphenation patterns for the given language tag
         try {
-            var patterns = loadHyphenatorPatterns(tag);
+            var patterns = loadHyphenatorPatterns(normalizedTag);
             var hyphenator = new Hyphenator(patterns);
             languageTagToHyphenator.put(tag, Optional.of(hyphenator));
             return hyphenator;
